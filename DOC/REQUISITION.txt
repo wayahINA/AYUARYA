@@ -1,0 +1,74 @@
+req.dbe
+=======
+
+1.after.scroll
+subOPEN();
+dateSAY();
+idSAY();
+
+
+2.before.close
+if(reqDS->State==dsEdit || reqDS->State==dsInsert)reqSQL->Post();
+
+
+3.before.post
+reqSQL->FieldByName("reqdt")->Value=reqDT->Date;
+ reqSQL->FieldByName("needed")->Value=needDT->Date;
+
+
+4.before.scroll
+if(reqDS->State==dsEdit)reqSQL->Post();
+
+
+5.on.newrecord
+reqSET();
+
+
+6.subOPEN
+dtlSQL->ParamByName("PARENT")->AsString=Trim(reqnoEDT->Text);
+dtlSQL->ParamByName("STDT")->AsDate=mnuFRM->stDT;
+dtlSQL->ParamByName("LSTDT")->AsDate=mnuFRM->lstDT;
+
+
+
+dtlREQ.DBE
+==========
+
+dtlSQL:
+select * from DTLREQ.dbe
+where (reqno=:PARENT and refno is null )
+and (  (refdt>=:STDT and refdt<=:LSTDT)  or refdt is null)
+
+
+1.AfterOpen
+setDT()
+sumOPEN()
+
+
+2.BeforeEdit
+oldCUR=Trim(dtlSQL->FieldByName("cur")->AsString);
+oldREQ=dtlSQL->FieldByName("req")->AsFloat;
+oldPRC=dtlSQL->FieldByName("price")->AsFloat;
+
+
+3.CalcFields
+dtlSQL->FieldByName("total")->AsFloat=
+dtlSQL->FieldByName("req")->AsFloat*
+dtlSQL->FieldByName("price")->AsFloat;
+
+
+4.NewRecord
+if(dtlDS->State!=dsEdit)dtlDS->Edit();
+dtlSQL->FieldByName("reqno")->AsString=
+reqSQL->FieldByName("reqno")->AsString;
+dtlSQL->FieldByName("refdt")->AsString=
+reqSQL->FieldByName("reqdt")->AsString;
+
+
+countSQL
+select distinct(reqno) 
+from DTLREQ.dbe
+where (reqno=:PARENT and refno is null)
+and (refdt is null )  
+
+
